@@ -24,7 +24,7 @@ Deployment: GitHub Pages, Netlify, Vercel, or Heroku
 
 🚀 Getting Started
 1. Clone the Repository
-git clone https://github.com/your-username/bloghub.git
+git clone https://github.com/Sxaurabh07/blogweb.git
 
 2. Install Dependencies (if backend/framework used)
 npm install

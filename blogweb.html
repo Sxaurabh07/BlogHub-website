@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Blog Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .blog-card:hover .blog-image {
+            transform: scale(1.05);
+        }
+        .blog-image {
+            transition: transform 0.3s ease;
+        }
+        .tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .tag {
+            transition: all 0.2s ease;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .drawer {
+            transition: transform 0.3s ease-out;
+        }
+        .drawer-hidden {
+            transform: translateX(100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="flex items-center">
+                        <i class="fas fa-book-open text-indigo-600 text-2xl mr-2"></i>
+                        <span class="font-bold text-gray-800 text-xl">BlogHub</span>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#" class="text-indigo-600 font-medium">Home</a>
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 transition">Categories</a>
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 transition">About</a>
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 transition">Contact</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Drawer -->
+    <div id="mobile-drawer" class="drawer drawer-hidden fixed inset-y-0 right-0 w-64 bg-white shadow-lg z-50 p-4">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-xl font-bold text-gray-800">Menu</h2>
+            <button id="close-drawer" class="text-gray-600 hover:text-indigo-600">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+        <div class="flex flex-col space-y-4">
+            <a href="#" class="text-indigo-600 font-medium">Home</a>
+            <a href="#" class="text-gray-600 hover:text-indigo-600 transition">Categories</a>
+            <a href="#" class="text-gray-600 hover:text-indigo-600 transition">About</a>
+            <a href="#" class="text-gray-600 hover:text-indigo-600 transition">Contact</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Hero Section -->
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-8 mb-10 text-white">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Discover Amazing Content</h1>
+            <p class="text-xl mb-6">Explore our collection of insightful articles on technology, design, business and more.</p>
+            <div class="relative max-w-md">
+                <input type="text" placeholder="Search articles..." class="w-full py-3 px-4 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                <button class="absolute right-2 top-2 bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 transition">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div class="flex flex-wrap gap-2">
+                <button class="category-btn active bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium" data-category="all">All</button>
+                <button class="category-btn bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-full text-sm font-medium" data-category="technology">Technology</button>
+                <button class="category-btn bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-full text-sm font-medium" data-category="design">Design</button>
+                <button class="category-btn bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-full text-sm font-medium" data-category="business">Business</button>
+                <button class="category-btn bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-full text-sm font-medium" data-category="lifestyle">Lifestyle</button>
+            </div>
+            <div class="relative">
+                <select class="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-4 pr-8 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    <option>Latest First</option>
+                    <option>Oldest First</option>
+                    <option>Most Popular</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blog Listing -->
+        <div id="blog-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            <!-- Blogs will be loaded here from JSON -->
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-center mb-12">
+            <nav class="flex items-center space-x-2">
+                <button class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="px-4 py-2 border rounded-lg bg-indigo-600 text-white">1</button>
+                <button class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100">2</button>
+                <button class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100">3</button>
+                <button class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Blog Detail Modal -->
+    <div id="blog-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-800">Blog Details</h2>
+                <button id="close-modal" class="text-gray-600 hover:text-indigo-600">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div id="modal-content" class="p-6">
+                <!-- Blog content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">BlogHub</h3>
+                    <p class="text-gray-400">Your source for the latest insights on technology, design, business and lifestyle.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Categories</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Technology</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Design</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Business</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Lifestyle</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Contact</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Subscribe</h4>
+                    <p class="text-gray-400 mb-4">Get the latest articles delivered to your inbox.</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Your email" class="py-2 px-4 rounded-l-lg w-full text-gray-800 focus:outline-none">
+                        <button class="bg-indigo-600 hover:bg-indigo-700 px-4 rounded-r-lg">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 BlogHub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Blog data (would normally come from a JSON file)
+        const blogData = [
+            {
+                id: 1,
+                title: "The Future of Web Development",
+                excerpt: "Exploring the latest trends and technologies shaping the future of web development.",
+                content: `<div class="fade-in">
+                    <div class="mb-8">
+                        <img src="https://source.unsplash.com/random/800x400/?web,development" alt="Web Development" class="w-full h-64 object-cover rounded-lg">
+                    </div>
+                    <h1 class="text-3xl font-bold mb-6">The Future of Web Development</h1>
+                    <div class="flex items-center mb-6">
+                        <div class="flex items-center">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Author" class="w-10 h-10 rounded-full mr-3">
+                            <div>
+                                <p class="font-medium">John Doe</p>
+                                <p class="text-gray-500 text-sm">Published on May 15, 2023 · 8 min read</p>
+                            </div>
+                        </div>
+                        <div class="ml-auto flex space-x-2">
+                            <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200">
+                                <i class="fas fa-share-alt text-gray-600"></i>
+                            </button>
+                            <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200">
+                                <i class="far fa-bookmark text-gray-600"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="prose max-w-none mb-8">
+                        <p>The web development landscape is constantly evolving, with new technologies emerging at a rapid pace. In this article, we'll explore the key trends that are shaping the future of web development.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">1. The Rise of WebAssembly</h2>
+                        <p>WebAssembly (Wasm) is revolutionizing how we build web applications. By allowing code written in languages like C, C++, and Rust to run in the browser at near-native speed, Wasm opens up new possibilities for performance-intensive applications like games, video editing, and CAD tools directly in the browser.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">2. Progressive Web Apps (PWAs)</h2>
+                        <p>PWAs continue to gain traction, blurring the line between web and native apps. With capabilities like offline functionality, push notifications, and home screen installation, PWAs offer a compelling alternative to traditional mobile apps, especially for businesses looking to reach users across multiple platforms.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">3. Serverless Architecture</h2>
+                        <p>The serverless paradigm is changing how we think about backend development. By abstracting away server management, developers can focus on writing code while the cloud provider handles scaling, availability, and maintenance. This approach is particularly beneficial for applications with variable traffic patterns.</p>
+                        
+                        <p>As we look ahead, it's clear that web development will continue to push boundaries, offering more powerful capabilities while maintaining the openness and accessibility that have made the web so successful.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Web Development</span>
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Technology</span>
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Future Trends</span>
+                    </div>
+                </div>`,
+                image: "https://source.unsplash.com/random/400x300/?web,development",
+                date: "2023-05-15",
+                author: "John Doe",
+                category: "technology",
+                tags: ["web development", "technology", "future trends"],
+                readTime: "8 min read"
+            },
+            {
+                id: 2,
+                title: "Minimalist Design Principles",
+                excerpt: "How to create clean, functional designs that focus on essential elements and improve user experience.",
+                content: `<div class="fade-in">
+                    <div class="mb-8">
+                        <img src="https://source.unsplash.com/random/800x400/?design,minimal" alt="Minimalist Design" class="w-full h-64 object-cover rounded-lg">
+                    </div>
+                    <h1 class="text-3xl font-bold mb-6">Minimalist Design Principles</h1>
+                    <div class="flex items-center mb-6">
+                        <div class="flex items-center">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Author" class="w-10 h-10 rounded-full mr-3">
+                            <div>
+                                <p class="font-medium">Sarah Johnson</p>
+                                <p class="text-gray-500 text-sm">Published on April 28, 2023 · 6 min read</p>
+                            </div>
+                        </div>
+                        <div class="ml-auto flex space-x-2">
+                            <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200">
+                                <i class="fas fa-share-alt text-gray-600"></i>
+                            </button>
+                            <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200">
+                                <i class="far fa-bookmark text-gray-600"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="prose max-w-none mb-8">
+                        <p>Minimalist design has become increasingly popular in recent years, offering a clean, uncluttered aesthetic that enhances usability. In this article, we'll explore the core principles of minimalist design and how to apply them effectively.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">1. Less is More</h2>
+                        <p>The fundamental principle of minimalist design is simplicity. This means stripping away all non-essential elements to focus on what truly matters. Every component should serve a purpose, whether functional or aesthetic.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">2. Strategic Use of White Space</h2>
+                        <p>White space (or negative space) is a powerful tool in minimalist design. It helps create balance, improves readability, and directs user attention to key elements. Don't be afraid to leave areas of your design empty.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">3. Limited Color Palette</h2>
+                        <p>Minimalist designs typically use a restrained color scheme, often with just one or two primary colors plus neutrals. This creates visual harmony and prevents overwhelming the user.</p>
+                        
+                        <p>By embracing these minimalist principles, designers can create interfaces that are not only aesthetically pleasing but also highly functional and user-friendly.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Design</span>
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">UI/UX</span>
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Minimalism</span>
+                    </div>
+                </div>`,
+                image: "https://source.unsplash.com/random/400x300/?design,minimal",
+                date: "2023-04-28",
+                author: "Sarah Johnson",
+                category: "design",
+                tags: ["design", "ui/ux", "minimalism"],
+                readTime: "6 min read"
+            },
+            {
+                id: 3,
+                title: "Startup Growth Strategies",
+                excerpt: "Proven methods for scaling your startup efficiently while maintaining product quality and company culture.",
+                content: `<div class="fade-in">
+                    <div class="mb-8">
+                        <img src="https://source.unsplash.com/random/800x400/?startup,business" alt="Startup Growth" class="w-full h-64 object-cover rounded-lg">
+                    </div>
+                    <h1 class="text-3xl font-bold mb-6">Startup Growth Strategies</h1>
+                    <div class="flex items-center mb-6">
+                        <div class="flex items-center">
+                            <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Author" class="w-10 h-10 rounded-full mr-3">
+                            <div>
+                                <p class="font-medium">Michael Chen</p>
+                                <p class="text-gray-500 text-sm">Published on June 5, 2023 · 10 min read</p>
+                            </div>
+                        </div>
+                        <div class="ml-auto flex space-x-2">
+                            <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200">
+                                <i class="fas fa-share-alt text-gray-600"></i>
+                            </button>
+                            <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200">
+                                <i class="far fa-bookmark text-gray-600"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="prose max-w-none mb-8">
+                        <p>Scaling a startup presents unique challenges that require careful planning and execution. In this comprehensive guide, we'll explore effective strategies for growing your startup sustainably.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">1. Product-Market Fit</h2>
+                        <p>Before focusing on growth, ensure you've achieved true product-market fit. This means your product satisfies a strong market demand. Look for indicators like organic growth, high retention rates, and customers becoming advocates for your product.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">2. Growth Loops</h2>
+                        <p>Implement self-reinforcing growth loops where each new user brings in more users. This could be through referral programs, network effects, or content that gets shared organically.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">3. Data-Driven Decision Making</h2>
+                        <p>Establish key metrics (KPIs) that align with your business goals. Use analytics to understand user behavior and make informed decisions about product development and marketing strategies.</p>
+                        
+                        <p>Remember that sustainable growth is about more than just acquiring users—it's about building a product people love and creating systems that allow your business to scale efficiently.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Business</span>
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Startups</span>
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Growth</span>
+                    </div>
+                </div>`,
+                image: "https://source.unsplash.com/random/400x300/?startup,business",
+                date: "2023-06-05",
+                author: "Michael Chen",
+                category: "business",
+                tags: ["business", "startups", "growth"],
+                readTime: "10 min read"
+            },
+            {
+                id: 4,
+                title: "Sustainable Living Tips",
+                excerpt: "Practical ways to reduce your environmental impact and live a more eco-friendly lifestyle.",
+                content: `<div class="fade-in">
+                    <div class="mb-8">
+                        <img src="https://source.unsplash.com/random/800x400/?sustainability,green" alt="Sustainable Living" class="w-full h-64 object-cover rounded-lg">
+                    </div>
+                    <h1 class="text-3xl font-bold mb-6">Sustainable Living Tips</h1>
+                    <div class="flex items-center mb-6">
+                        <div class="flex items-center">
+                            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Author" class="w-10 h-10 rounded-full mr-3">
+                            <div>
+                                <p class="font-medium">Emma Wilson</p>
+                                <p class="text-gray-500 text-sm">Published on May 22, 2023 · 7 min read</p>
+                            </div>
+                        </div>
+                        <div class="ml-auto flex space-x-2">
+                            <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200">
+                                <i class="fas fa-share-alt text-gray-600"></i>
+                            </button>
+                            <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200">
+                                <i class="far fa-bookmark text-gray-600"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="prose max-w-none mb-8">
+                        <p>Adopting a sustainable lifestyle doesn't require drastic changes—small, consistent actions can make a significant difference. Here are practical tips to reduce your environmental footprint.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">1. Reduce Single-Use Plastics</h2>
+                        <p>Carry reusable shopping bags, water bottles, and coffee cups. Choose products with minimal packaging or packaging made from recycled materials.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">2. Energy Efficiency at Home</h2>
+                        <p>Switch to LED bulbs, unplug electronics when not in use, and consider a programmable thermostat. These small changes can significantly reduce your energy consumption.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">3. Sustainable Food Choices</h2>
+                        <p>Reduce meat consumption, buy local and seasonal produce, and minimize food waste by planning meals and properly storing leftovers.</p>
+                        
+                        <p>Sustainability is a journey, not a destination. Start with changes that feel manageable and build from there. Every small action contributes to a healthier planet.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Lifestyle</span>
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Sustainability</span>
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Eco-friendly</span>
+                    </div>
+                </div>`,
+                image: "https://source.unsplash.com/random/400x300/?sustainability,green",
+                date: "2023-05-22",
+                author: "Emma Wilson",
+                category: "lifestyle",
+                tags: ["lifestyle", "sustainability", "eco-friendly"],
+                readTime: "7 min read"
+            },
+            {
+                id: 5,
+                title: "Artificial Intelligence in Healthcare",
+                excerpt: "How AI is transforming diagnosis, treatment, and patient care in the medical field.",
+                content: `<div class="fade-in">
+                    <div class="mb-8">
+                        <img src="https://source.unsplash.com/random/800x400/?ai,healthcare" alt="AI in Healthcare" class="w-full h-64 object-cover rounded-lg">
+                    </div>
+                    <h1 class="text-3xl font-bold mb-6">Artificial Intelligence in Healthcare</h1>
+                    <div class="flex items-center mb-6">
+                        <div class="flex items-center">
+                            <img src="https://randomuser.me/api/portraits/men/52.jpg" alt="Author" class="w-10 h-10 rounded-full mr-3">
+                            <div>
+                                <p class="font-medium">David Rodriguez</p>
+                                <p class="text-gray-500 text-sm">Published on June 12, 2023 · 9 min read</p>
+                            </div>
+                        </div>
+                        <div class="ml-auto flex space-x-2">
+                            <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200">
+                                <i class="fas fa-share-alt text-gray-600"></i>
+                            </button>
+                            <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200">
+                                <i class="far fa-bookmark text-gray-600"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="prose max-w-none mb-8">
+                        <p>Artificial intelligence is revolutionizing healthcare, offering new ways to diagnose diseases, develop treatments, and improve patient outcomes. This article explores the current applications and future potential of AI in medicine.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">1. Diagnostic Assistance</h2>
+                        <p>AI algorithms can analyze medical images (X-rays, MRIs, CT scans) with accuracy rivaling human experts. They help detect early signs of conditions like cancer, diabetic retinopathy, and neurological disorders.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">2. Drug Discovery</h2>
+                        <p>Machine learning models can predict how different compounds will behave and how likely they are to make effective treatments, significantly accelerating the drug discovery process.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">3. Personalized Medicine</h2>
+                        <p>AI enables treatment plans tailored to individual patients by analyzing their genetic information, lifestyle factors, and treatment responses from similar cases.</p>
+                        
+                        <p>While AI presents tremendous opportunities, it's important to address challenges like data privacy, algorithmic bias, and maintaining the human touch in patient care.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Technology</span>
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Healthcare</span>
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">AI</span>
+                    </div>
+                </div>`,
+                image: "https://source.unsplash.com/random/400x300/?ai,healthcare",
+                date: "2023-06-12",
+                author: "David Rodriguez",
+                category: "technology",
+                tags: ["technology", "healthcare", "ai"],
+                readTime: "9 min read"
+            },
+            {
+                id: 6,
+                title: "Remote Work Best Practices",
+                excerpt: "Strategies for maintaining productivity, collaboration, and work-life balance in a remote work environment.",
+                content: `<div class="fade-in">
+                    <div class="mb-8">
+                        <img src="https://source.unsplash.com/random/800x400/?remote,work" alt="Remote Work" class="w-full h-64 object-cover rounded-lg">
+                    </div>
+                    <h1 class="text-3xl font-bold mb-6">Remote Work Best Practices</h1>
+                    <div class="flex items-center mb-6">
+                        <div class="flex items-center">
+                            <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Author" class="w-10 h-10 rounded-full mr-3">
+                            <div>
+                                <p class="font-medium">Lisa Thompson</p>
+                                <p class="text-gray-500 text-sm">Published on May 8, 2023 · 8 min read</p>
+                            </div>
+                        </div>
+                        <div class="ml-auto flex space-x-2">
+                            <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200">
+                                <i class="fas fa-share-alt text-gray-600"></i>
+                            </button>
+                            <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200">
+                                <i class="far fa-bookmark text-gray-600"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="prose max-w-none mb-8">
+                        <p>The shift to remote work has transformed how we approach our professional lives. Whether you're new to remote work or looking to optimize your routine, these best practices can help you thrive in a distributed work environment.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">1. Create a Dedicated Workspace</h2>
+                        <p>Designate a specific area for work to mentally separate professional and personal life. Ensure your workspace is comfortable, ergonomic, and free from distractions.</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">2. Establish a Routine</h2>
+                        <p>Maintain regular working hours with clear start and end times. Include breaks to recharge—try the Pomodoro technique (25 minutes of focused work followed by a 5-minute break).</p>
+                        
+                        <h2 class="text-2xl font-bold mt-8 mb-4">3. Effective Communication</h2>
+                        <p>Over-communicate to compensate for lack of in-person interactions. Use video calls for complex discussions, async communication for updates, and be mindful of time zones when collaborating globally.</p>
+                        
+                        <p>Remote work offers flexibility but requires discipline. By implementing these practices, you can maintain productivity while enjoying the benefits of working from anywhere.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Business</span>
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Work</span>
+                        <span class="tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Productivity</span>
+                    </div>
+                </div>`,
+                image: "https://source.unsplash.com/random/400x300/?remote,work",
+                date: "2023-05-08",
+                author: "Lisa Thompson",
+                category: "business",
+                tags: ["business", "work", "productivity"],
+                readTime: "8 min read"
+            }
+        ];
+
+        // DOM Elements
+        const blogContainer = document.getElementById('blog-container');
+        const blogModal = document.getElementById('blog-modal');
+        const modalContent = document.getElementById('modal-content');
+        const closeModal = document.getElementById('close-modal');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const closeDrawer = document.getElementById('close-drawer');
+        const mobileDrawer = document.getElementById('mobile-drawer');
+        const categoryButtons = document.querySelectorAll('.category-btn');
+
+        // Display all blogs initially
+        function displayBlogs(blogs) {
+            blogContainer.innerHTML = '';
+            blogs.forEach(blog => {
+                const blogCard = document.createElement('div');
+                blogCard.className = 'blog-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition';
+                blogCard.innerHTML = `
+                    <div class="h-48 overflow-hidden">
+                        <img src="${blog.image}" alt="${blog.title}" class="blog-image w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <span class="text-sm font-medium text-indigo-600">${blog.category.charAt(0).toUpperCase() + blog.category.slice(1)}</span>
+                            <span class="mx-2 text-gray-400">•</span>
+                            <span class="text-sm text-gray-500">${blog.date}</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">${blog.title}</h3>
+                        <p class="text-gray-600 mb-4">${blog.excerpt}</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <img src="https://randomuser.me/api/portraits/${blog.author.includes('Sarah') || blog.author.includes('Emma') || blog.author.includes('Lisa') ? 'women' : 'men'}/${Math.floor(Math.random() * 100)}.jpg" alt="${blog.author}" class="w-8 h-8 rounded-full mr-2">
+                                <span class="text-sm text-gray-600">${blog.author}</span>
+                            </div>
+                            <button class="read-more-btn px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" data-id="${blog.id}">
+                                Read More
+                            </button>
+                        </div>
+                    </div>
+                `;
+                blogContainer.appendChild(blogCard);
+            });
+
+            // Add event listeners to "Read More" buttons
+            document.querySelectorAll('.read-more-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const blogId = parseInt(this.getAttribute('data-id'));
+                    showBlogDetails(blogId);
+                });
+            });
+        }
+
+        // Show blog details in modal
+        function showBlogDetails(id) {
+            const blog = blogData.find(b => b.id === id);
+            if (blog) {
+                modalContent.innerHTML = blog.content;
+                blogModal.classList.remove('hidden');
+                blogModal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Close modal
+        closeModal.addEventListener('click', function() {
+            blogModal.classList.add('hidden');
+            blogModal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        });
+
+        // Mobile menu toggle
+        mobileMenuButton.addEventListener('click', function() {
+            mobileDrawer.classList.remove('drawer-hidden');
+        });
+
+        closeDrawer.addEventListener('click', function() {
+            mobileDrawer.classList.add('drawer-hidden');
+        });
+
+        // Filter blogs by category
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                categoryButtons.forEach(btn => btn.classList.remove('active', 'bg-indigo-600', 'text-white'));
+                
+                // Add active class to clicked button
+                this.classList.add('active', 'bg-indigo-600', 'text-white');
+                this.classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                
+                const category = this.getAttribute('data-category');
+                if (category === 'all') {
+                    displayBlogs(blogData);
+                } else {
+                    const filteredBlogs = blogData.filter(blog => blog.category === category);
+                    displayBlogs(filteredBlogs);
+                }
+            });
+        });
+
+        // Close modal when clicking outside content
+        blogModal.addEventListener('click', function(e) {
+            if (e.target === blogModal) {
+                blogModal.classList.add('hidden');
+                blogModal.classList.remove('flex');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Initialize the page
+        displayBlogs(blogData);
+    </script>
+</body>
+</html>
